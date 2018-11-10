@@ -1,5 +1,5 @@
-import Bacon from 'baconjs'
-import * as R from 'ramda'
+import {fromEvent, mergeAll, combineTemplate} from 'baconjs'
+import {equals, prop, pathSatisfies, not} from 'ramda'
 import {
   formatToTest,
   copyToClipboard,
@@ -19,15 +19,15 @@ const tester = (event: any): string => {
   }
 }
 
-const clicks = Bacon.fromEvent(document, 'click')
-const changes = Bacon.fromEvent(document, 'change')
+const clicks = fromEvent(document, 'click')
+const changes = fromEvent(document, 'change')
 
-const keydowns = Bacon.fromEvent(document, 'keydown')
+const keydowns = fromEvent(document, 'keydown')
 const keyCodes = keydowns.map('.key')
-const control = keyCodes.filter(R.equals('Control'))
+const control = keyCodes.filter(equals('Control'))
 
 const recordingStart = control 
-const recordingStatus = recordingStart.scan(false, R.not).skip(1)
+const recordingStatus = recordingStart.scan(false, not).skip(1)
 
 recordingStatus
   .onValue(toggleBodyClass)
@@ -41,9 +41,9 @@ showExpectUi
     document.body.append(expectUI())
   })
 
-const events = Bacon.mergeAll(clicks, changes)
+const events = mergeAll(clicks, changes)
   .filter(recordingStatus)
-  .filter(R.pathSatisfies(notEmpty, ['target', 'id']))
+  .filter(pathSatisfies(notEmpty, ['target', 'id']))
   .map(({type, target}) => 
     type === 'click'
       ? {target, type}
@@ -58,11 +58,11 @@ const showResults = recordingStatus
   .slidingWindow(2, 2)
   .map(([prev, next]) => prev && !next)
 
-Bacon.combineTemplate({
+combineTemplate({
   showResults,
   lines
 })
-  .filter(R.prop('showResults'))
+  .filter(prop('showResults'))
   .map('.lines')
   .map(formatToTest)
   .doAction(console.log)

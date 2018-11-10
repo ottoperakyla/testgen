@@ -1,16 +1,17 @@
 import * as R from 'ramda'
 
-export const notEmpty = a =>
+export const notEmpty = (a: any): boolean =>
   !R.isEmpty(a)
 
-export const toggleBodyClass = toggle =>
+export const toggleBodyClass = (toggle: boolean): void => {
   document.body.classList.toggle('recording', toggle)
+}
 
-export const formatToTest = lines => {
+export const formatToTest = (lines: Array<string>): string => {
   return lines.join('\n')
 }
 
-export const copyToClipboard = str => {
+export const copyToClipboard = (str: string): void => {
   const el = document.createElement('textarea')
   el.value = str
   document.body.appendChild(el)
@@ -19,7 +20,7 @@ export const copyToClipboard = str => {
   document.body.removeChild(el)
 }
 
-export const expectUI = () => {
+export const expectUI = (): HTMLDivElement => {
   const wrapper = document.createElement('div')
   const template = `
     <h4>Assert</h4>
@@ -31,5 +32,6 @@ export const expectUI = () => {
   `
   wrapper.className = 'expect-ui'
   wrapper.innerHTML = template
+  
   return wrapper
 }
